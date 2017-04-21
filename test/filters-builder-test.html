@@ -1,0 +1,293 @@
+<!--
+Copyright 2017 Next Century Corporation
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <script src="../../web-component-tester/browser.js"></script>
+  <link rel="import" href="../filters-builder.html">
+</head>
+
+<body>
+  <test-fixture id="filters-builder-fixture">
+    <template>
+      <filters-builder></filters-builder>
+    </template>
+  </test-fixture>
+
+  <script>
+    /* globals suite, setup, fixture, test, expect */
+    /* jshint -W030 */
+
+    suite('filters-builder private tests', function() {
+      var element;
+
+      setup(function() {
+        element = fixture('filters-builder-fixture');
+        element.callback = {};
+      });
+
+      test('default properties are set correctly', function() {
+        expect(element.config).to.not.exist;
+        expect(element.data).to.not.exist;
+        expect(element.callbackTerms).to.equal('terms');
+        expect(element.filters).to.deep.equal([]);
+      });
+
+      test('does have an elastic-client-filter-builder element', function() {
+        expect(element.$$('elastic-client-filter-builder')).to.exist;
+        expect(element.$$('elastic-client-filter-builder').id).to.equal('builder');
+      });
+
+      test('_buildTermsFilter does return null if callback.terms is undefined', function() {
+        expect(element._buildTermsFilter('key', 'field', ['value'])).to.be.null;
+      });
+
+      test('_buildTermsFilter does return null if terms are empty', function() {
+        element.callback.terms = function(terms) {
+          return terms;
+        };
+
+        expect(element._buildTermsFilter('key', 'field', [])).to.be.null;
+      });
+
+      test('_buildTermsFilter does return correct filter', function() {
+        element.callback.terms = function(terms) {
+          return terms;
+        };
+
+        expect(element._buildTermsFilter('key', 'field', ['value']).toJSON()).to.deep.equal({
+          terms: {
+            field: ['value'],
+            _name: 'key',
+          }
+        });
+      });
+
+      test('_buildTermsFilter does return correct filter with multiple terms', function() {
+        element.callback.terms = function(terms) {
+          return terms;
+        };
+
+        expect(element._buildTermsFilter('key', 'field', ['value1', 'value2']).toJSON()).to.deep.equal({
+          terms: {
+            field: ['value1', 'value2'],
+            _name: 'key',
+          }
+        });
+      });
+    });
+
+    suite('filters-builder filters tests', function() {
+      var element;
+
+      setup(function() {
+        element = fixture('filters-builder-fixture');
+
+        element.config = {
+          stringKey1: {
+            field: 'stringField1'
+          },
+          stringKey2: {
+            field: 'stringField2'
+          },
+        };
+
+        element.data = {
+          stringKey1: [],
+          stringKey2: []
+        };
+
+        element.callback = {
+          terms: function(terms) {
+            return terms;
+          }
+        };
+      });
+
+      test('filters is empty array by default', function() {
+        expect(element.filters).to.deep.equal([]);
+      });
+
+      test('filters is built correctly with string fields', function() {
+        element.set('data.stringKey1', ['value1', 'value2']);
+
+        expect(element.filters.length).to.equal(1);
+        expect(element.filters[0].toJSON()).to.deep.equal({
+          terms: {
+            stringField1: ['value1', 'value2'],
+            _name: 'stringKey1',
+          }
+        });
+      });
+
+      test('filters is built correctly with multiple fields', function() {
+        element.set('data', {
+          stringKey1: ['value1', 'value2'],
+          stringKey2: ['value3', 'value4']
+        });
+
+        expect(element.filters.length).to.equal(2);
+        expect(element.filters[0].toJSON()).to.deep.equal({
+          terms: {
+            stringField1: ['value1', 'value2'],
+            _name: 'stringKey1',
+          }
+        });
+        expect(element.filters[1].toJSON()).to.deep.equal({
+          terms: {
+            stringField2: ['value3', 'value4'],
+            _name: 'stringKey2',
+          }
+        });
+      });
+
+      test('filters is only set once', function(done) {
+        var called = 0;
+        element.onFiltersChange = function() {
+          ++called;
+          if(called > 1) {
+            expect.fail();
+          }
+          expect(element.filters.length).to.equal(2);
+          expect(element.filters[0].toJSON()).to.deep.equal({
+            terms: {
+              stringField1: ['value1', 'value2'],
+              _name: 'stringKey1',
+            }
+          });
+          expect(element.filters[1].toJSON()).to.deep.equal({
+            terms: {
+              stringField2: ['value3', 'value4'],
+              _name: 'stringKey2',
+            }
+          });
+          done();
+        };
+
+        element.listen(element, 'filters-changed', 'onFiltersChange');
+
+        element.set('data', {
+          stringKey1: ['value1', 'value2'],
+          stringKey2: ['value3', 'value4']
+        });
+      });
+
+      test('filters is updated correctly with updated terms', function() {
+        element.set('data.stringKey1', ['value1', 'value2']);
+
+        expect(element.filters.length).to.equal(1);
+
+        element.set('data.stringKey1', ['value1']);
+
+        expect(element.filters.length).to.equal(1);
+        expect(element.filters[0].toJSON()).to.deep.equal({
+          terms: {
+            stringField1: ['value1'],
+            _name: 'stringKey1',
+          }
+        });
+      });
+
+      test('filters is updated correctly with changed terms', function() {
+        element.set('data.stringKey1', ['value1', 'value2']);
+
+        expect(element.filters.length).to.equal(1);
+
+        element.set('data.stringKey1', ['value3', 'value4']);
+
+        expect(element.filters.length).to.equal(1);
+        expect(element.filters[0].toJSON()).to.deep.equal({
+          terms: {
+            stringField1: ['value3', 'value4'],
+            _name: 'stringKey1',
+          }
+        });
+      });
+
+      test('filters is updated correctly with updated fields', function() {
+        element.set('data.stringKey1', ['value1', 'value2']);
+
+        expect(element.filters.length).to.equal(1);
+
+        element.set('data.stringKey2', ['value3', 'value4']);
+
+        expect(element.filters.length).to.equal(2);
+        expect(element.filters[0].toJSON()).to.deep.equal({
+          terms: {
+            stringField1: ['value1', 'value2'],
+            _name: 'stringKey1',
+          }
+        });
+        expect(element.filters[1].toJSON()).to.deep.equal({
+          terms: {
+            stringField2: ['value3', 'value4'],
+            _name: 'stringKey2',
+          }
+        });
+      });
+
+      test('filters is updated correctly with changed fields', function() {
+        element.set('data.stringKey1', ['value1', 'value2']);
+
+        expect(element.filters.length).to.equal(1);
+
+        element.set('data', {
+          stringKey1: [],
+          stringKey2: ['value3', 'value4']
+        });
+
+        expect(element.filters.length).to.equal(1);
+        expect(element.filters[0].toJSON()).to.deep.equal({
+          terms: {
+            stringField2: ['value3', 'value4'],
+            _name: 'stringKey2',
+          }
+        });
+      });
+
+      test('filters is not updated if the newly built array is equal', function() {
+        element.set('data.stringKey1', ['value1', 'value2']);
+
+        expect(element.filters.length).to.equal(1);
+        var filters = element.filters;
+
+        element.onFiltersChange = function() {
+          expect.fail();
+        };
+
+        element.listen(element, 'filters-changed', 'onFiltersChanged');
+
+        element.set('data.stringKey1', ['value1', 'value2']);
+
+        expect(element.filters).to.deep.equal(filters);
+      });
+
+      test('filters is set to empty array if terms are deleted', function() {
+        element.set('data.stringKey1', ['value1', 'value2']);
+
+        expect(element.filters.length).to.equal(1);
+
+        element.set('data.stringKey1', []);
+
+        expect(element.filters).to.deep.equal([]);
+      });
+    });
+  </script>
+</body>
+</html>

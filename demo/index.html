@@ -1,0 +1,123 @@
+<!--
+Copyright 2017 Next Century Corporation
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <script src="../../webcomponentsjs/webcomponents-lite.min.js"></script>
+  <link rel="import" href="../filters-builder.html">
+</head>
+
+<body unresolved>
+  <template is="dom-bind" id="demo">
+    <p>Terms Callback: [[callback.terms]]</p>
+    <p>Config: [[stringify(config)]]</p>
+
+    <h3>Demo #1</h3>
+    <p>Data: [[stringify(data1)]]</p>
+    <p>Filters: [[stringify(filters1)]]</p>
+
+    <filters-builder
+      callback="[[callback]]"
+      config="[[config]]"
+      data="[[data1]]"
+      filters="{{filters1}}">
+    </filters-builder>
+
+    <h3>Demo #2</h3>
+    <p>Data: [[stringify(data2)]]</p>
+    <p>Filters: [[stringify(filters2)]]</p>
+
+    <filters-builder
+      callback="[[callback]]"
+      config="[[config]]"
+      data="[[data2]]"
+      filters="{{filters2}}">
+    </filters-builder>
+
+    <h3>Demo #3</h3>
+    <p>Data: [[stringify(data3)]]</p>
+    <p>Filters: [[stringify(filters3)]]</p>
+
+    <filters-builder
+      callback="[[callback]]"
+      config="[[config]]"
+      data="[[data3]]"
+      filters="{{filters3}}">
+    </filters-builder>
+
+    <h3>Demo #4</h3>
+    <p>Data: [[stringify(data4)]]</p>
+    <p>Filters: [[stringify(filters4)]]</p>
+
+    <filters-builder
+      callback="[[callback]]"
+      config="[[config]]"
+      data="[[data4]]"
+      filters="{{filters4}}">
+    </filters-builder>
+  </template>
+
+  <script>
+    (function(document) {
+      var demo = document.querySelector('#demo');
+
+      demo.callback = {
+        terms: function(object) {
+          return object.value;
+        }
+      };
+
+      demo.config = {
+        myKey1: {
+          field: 'myField1'
+        },
+        myKey2: {
+          field: 'myField2'
+        }
+      };
+
+      demo.data1 = {};
+
+      demo.data2 = {
+        myKey1: {
+          value: ['myValue']
+        }
+      };
+
+      demo.data3 = {
+        myKey1: {
+          value: ['myValue1', 'myValue2']
+        }
+      };
+
+      demo.data4 = {
+        myKey1: {
+          value: ['myValue1', 'myValue2']
+        },
+        myKey2: {
+          value: [1, 2]
+        }
+      };
+
+      demo.stringify = function(object) {
+        return JSON.stringify(object);
+      };
+    })(document);
+  </script>
+</body>
+</html>

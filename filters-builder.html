@@ -1,0 +1,205 @@
+<!--
+Copyright 2017 Next Century Corporation
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../elastic-client-filter-builder/elastic-client-filter-builder.html">
+<link rel="import" href="../lodash-import/lodash.html">
+
+<!--
+A Polymer Element that builds a list of elasticsearch filters using given config and data.
+
+The `callback` object contains callback functions with properties defined by `callbackTerms` (default `terms`) that return terms from filter objects of specific types.  The terms property contains a function that returns the array of terms using the given filter object from `data` (or `[]` by default).
+
+The `config` object contains a collection of unique keys from `data` mapped to config objects with properties {String} `field` and (Optional) {String} `type`.  The default type is "string".  Supported types are "string".
+
+The `data` object contains a collection of unique keys mapped to search objects with terms.  The keys in `data` match the keys in `config`.  The filter objects are sent to the `callback` functions.
+
+### Example
+```js
+callback = {
+  terms: function(object) {
+    return object.value;
+  }
+};
+
+config = {
+  myKey1: {
+    field: 'myField1'
+  },
+  myKey2: {
+    field: 'myField2'
+  }
+};
+
+data = {
+  myKey1: {
+    value: ['myValue']
+  },
+  myKey2: {
+    value: [1, 2, 3]
+  }
+};
+```
+
+```html
+<filters-builder 
+  callback="[[callback]]"
+  config="[[config]]"
+  data="[[data]]"
+  filters="{{filters}}">
+</filters-builder>
+```
+
+@demo demo/index.html
+-->
+
+<dom-module id="filters-builder">
+  <template>
+    <elastic-client-filter-builder id="builder"></elastic-client-filter-builder>
+  </template>
+
+  <script>
+  (function() {
+    /* globals _ */
+    'use strict';
+
+    Polymer({
+      is: 'filters-builder',
+
+      properties: {
+        /**
+         * (Required)
+         *
+         * An object containing callback functions with properties defined by `callbackTerms` (default `terms`) that return terms from
+         * filter objects of specific types.
+         *
+         * The terms property contains a function that returns the array of terms using the given filter object from `data` (or `[]` by
+         * default).
+         *
+         * @type {Object}
+         */
+        callback: {
+          type: Object
+        },
+
+        /**
+         * (Required)
+         *
+         * An object containing a collection of unique keys from `data` mapped to config objects with properties {String} `field` and
+         * (Optional) {String} `type`.  The default type is "string".  Supported types are "string".
+         *
+         * @type {Object}
+         */
+        config: {
+          type: Object
+        },
+
+        /**
+         * (Required)
+         *
+         * An object containing a collection of unique keys mapped to filter objects with terms.  The keys in `data` match the keys in
+         * `config`.  The filter objects are sent to the `callback` functions.
+         *
+         * @type {Object}
+         */
+        data: {
+          type: Object
+        },
+
+        /**
+         * (Optional)
+         *
+         * The property name of the terms function in the "callback" object.
+         *
+         * @type {String}
+         * @default 'terms'
+         */
+        callbackTerms: {
+          type: String,
+          value: 'terms'
+        },
+
+        /**
+         * (Output)
+         *
+         * The list of elasticsearch filters.
+         *
+         * @type {Array}
+         * @default []
+         */
+        filters: {
+          computed: '_buildFilters(data.*)',
+          notify: true,
+          type: Array,
+          value: function() {
+            return [];
+          }
+        }
+      },
+
+      /**
+       * Builds and returns the list of elasticsearch filters.
+       *
+       * @return {Array}
+       * @private
+       */
+      _buildFilters: function() {
+        if(!this.config) {
+          return [];
+        }
+
+        var self = this;
+        var filters = [];
+
+        _.keys(this.data).forEach(function(key) {
+          if(self.config[key] && self.config[key].field && self.data[key]) {
+            var field = self.config[key].field;
+            var object = self.data[key];
+            var filter = self._buildTermsFilter(key, field, object);
+            if(filter) {
+              filters.push(filter);
+            }
+          }
+        });
+
+        var difference = filters.length !== this.filters.length || filters.some(function(filter, index) {
+          return !_.isEqual(filter.toJSON(), self.filters[index].toJSON());
+        });
+        return difference ? filters : this.filters;
+      },
+
+      /**
+       * Builds and returns the elasticsearch terms filter using the given key, field, and filter data object.
+       *
+       * @param {String} key
+       * @param {String} field
+       * @param {Object} object
+       * @return {null|Object}
+       * @private
+       */
+      _buildTermsFilter: function(key, field, object) {
+        var terms = this.callback && this.callbackTerms && this.callback[this.callbackTerms] ? this.callback[this.callbackTerms](object) : [];
+
+        if(!terms || !terms.length) {
+          return null;
+        }
+
+        return this.$$('#builder').buildFilter('terms', false, key, field, terms);
+      }
+    });
+  })();
+  </script>
+</dom-module>
