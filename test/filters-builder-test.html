@@ -46,6 +46,7 @@ limitations under the License.
         expect(element.config).to.not.exist;
         expect(element.data).to.not.exist;
         expect(element.callbackTerms).to.equal('terms');
+        expect(element.callbackDates).to.equal('dates');
         expect(element.filters).to.deep.equal([]);
       });
 
@@ -91,6 +92,43 @@ limitations under the License.
           }
         });
       });
+
+      test('_buildDateRangeFilter does return null if callback.dates is undefined', function() {
+        expect(element._buildDateRangeFilter('key', 'field', ['value'])).to.be.null;
+      });
+
+      test('_buildDateRangeFilter does return null if dates are empty', function() {
+        element.callback.dates = function(dates) {
+          return dates;
+        };
+
+        expect(element._buildDateRangeFilter('key', 'field', [])).to.be.null;
+      });
+
+      test('_buildDateRangeFilter does return null if only one date is specified', function() {
+        element.callback.dates = function(dates) {
+          return dates;
+        };
+
+        expect(element._buildDateRangeFilter('key', 'field', ['value'])).to.be.null;
+      });
+
+      test('_buildDateRangeFilter does return correct filter with multiple dates', function() {
+        element.callback.dates = function(dates) {
+          return dates;
+        };
+
+        expect(element._buildDateRangeFilter('key', 'field', ['value1', 'value2']).toJSON()).to.deep.equal({
+          range: {
+            field: {
+              gte: 'value1',
+              lte: 'value2'
+            },
+            _name: 'key'
+          }
+        });
+      });
+
     });
 
     suite('filters-builder filters tests', function() {
@@ -106,16 +144,24 @@ limitations under the License.
           stringKey2: {
             field: 'stringField2'
           },
+          stringKey3: {
+            field: 'stringField3',
+            type: 'date'
+          }
         };
 
         element.data = {
           stringKey1: [],
-          stringKey2: []
+          stringKey2: [],
+          stringKey3: []
         };
 
         element.callback = {
           terms: function(terms) {
             return terms;
+          },
+          dates: function(dates) {
+            return dates;
           }
         };
       });
@@ -124,7 +170,7 @@ limitations under the License.
         expect(element.filters).to.deep.equal([]);
       });
 
-      test('filters is built correctly with string fields', function() {
+      test('filters is built correctly with a terms filter', function() {
         element.set('data.stringKey1', ['value1', 'value2']);
 
         expect(element.filters.length).to.equal(1);
@@ -136,13 +182,30 @@ limitations under the License.
         });
       });
 
+      test('filters is built correctly with a range filter', function() {
+        element.set('data.stringKey3', ['value1', 'value2']);
+
+        expect(element.filters.length).to.equal(1);
+
+        expect(element.filters[0].toJSON()).to.deep.equal({
+          range: {
+            stringField3: {
+              gte: 'value1',
+              lte: 'value2'
+            },
+            _name: 'stringKey3'
+          }
+        });
+      });
+
       test('filters is built correctly with multiple fields', function() {
         element.set('data', {
           stringKey1: ['value1', 'value2'],
-          stringKey2: ['value3', 'value4']
+          stringKey2: ['value3', 'value4'],
+          stringKey3: ['value5', 'value6']
         });
 
-        expect(element.filters.length).to.equal(2);
+        expect(element.filters.length).to.equal(3);
         expect(element.filters[0].toJSON()).to.deep.equal({
           terms: {
             stringField1: ['value1', 'value2'],
@@ -155,6 +218,15 @@ limitations under the License.
             _name: 'stringKey2',
           }
         });
+        expect(element.filters[2].toJSON()).to.deep.equal({
+          range: {
+            stringField3: {
+              gte: 'value5',
+              lte: 'value6'
+            },
+            _name: 'stringKey3'
+          }
+        });
       });
 
       test('filters is only set once', function(done) {
@@ -164,7 +236,7 @@ limitations under the License.
           if(called > 1) {
             expect.fail();
           }
-          expect(element.filters.length).to.equal(2);
+          expect(element.filters.length).to.equal(3);
           expect(element.filters[0].toJSON()).to.deep.equal({
             terms: {
               stringField1: ['value1', 'value2'],
@@ -177,6 +249,15 @@ limitations under the License.
               _name: 'stringKey2',
             }
           });
+          expect(element.filters[2].toJSON()).to.deep.equal({
+            range: {
+              stringField3: {
+                gte: 'value5',
+                lte: 'value6'
+              },
+              _name: 'stringKey3'
+            }
+          });
           done();
         };
 
@@ -184,7 +265,8 @@ limitations under the License.
 
         element.set('data', {
           stringKey1: ['value1', 'value2'],
-          stringKey2: ['value3', 'value4']
+          stringKey2: ['value3', 'value4'],
+          stringKey3: ['value5', 'value6']
         });
       });
 
@@ -220,6 +302,25 @@ limitations under the License.
         });
       });
 
+      test('filters is updated correctly with changed range values', function() {
+        element.set('data.stringKey3', ['value1', 'value2']);
+
+        expect(element.filters.length).to.equal(1);
+
+        element.set('data.stringKey3', ['value3', 'value4']);
+
+        expect(element.filters.length).to.equal(1);
+        expect(element.filters[0].toJSON()).to.deep.equal({
+          range: {
+            stringField3: {
+              gte: 'value3',
+              lte: 'value4'
+            },
+            _name: 'stringKey3'
+          }
+        });
+      });
+
       test('filters is updated correctly with updated fields', function() {
         element.set('data.stringKey1', ['value1', 'value2']);
 
@@ -228,6 +329,10 @@ limitations under the License.
         element.set('data.stringKey2', ['value3', 'value4']);
 
         expect(element.filters.length).to.equal(2);
+
+        element.set('data.stringKey3', ['value5', 'value6']);
+
+        expect(element.filters.length).to.equal(3);
         expect(element.filters[0].toJSON()).to.deep.equal({
           terms: {
             stringField1: ['value1', 'value2'],
@@ -238,6 +343,15 @@ limitations under the License.
           terms: {
             stringField2: ['value3', 'value4'],
             _name: 'stringKey2',
+          }
+        });
+        expect(element.filters[2].toJSON()).to.deep.equal({
+          range: {
+            stringField3: {
+              gte: 'value5',
+              lte: 'value6'
+            },
+            _name: 'stringKey3'
           }
         });
       });
@@ -263,8 +377,9 @@ limitations under the License.
 
       test('filters is not updated if the newly built array is equal', function() {
         element.set('data.stringKey1', ['value1', 'value2']);
+        element.set('data.stringKey3', ['value3', 'value4']);
 
-        expect(element.filters.length).to.equal(1);
+        expect(element.filters.length).to.equal(2);
         var filters = element.filters;
 
         element.onFiltersChange = function() {
@@ -274,6 +389,7 @@ limitations under the License.
         element.listen(element, 'filters-changed', 'onFiltersChanged');
 
         element.set('data.stringKey1', ['value1', 'value2']);
+        element.set('data.stringKey3', ['value3', 'value4']);
 
         expect(element.filters).to.deep.equal(filters);
       });
@@ -284,6 +400,20 @@ limitations under the License.
         expect(element.filters.length).to.equal(1);
 
         element.set('data.stringKey1', []);
+
+        expect(element.filters).to.deep.equal([]);
+      });
+
+      test('filters is set to empty if one or both of the range values is removed', function() {
+        element.set('data.stringKey3', ['value1', 'value2']);
+
+        expect(element.filters.length).to.equal(1);
+
+        element.set('data.stringKey3', ['value2']);
+
+        expect(element.filters).to.deep.equal([]);
+
+        element.set('data.stringKey3', []);
 
         expect(element.filters).to.deep.equal([]);
       });

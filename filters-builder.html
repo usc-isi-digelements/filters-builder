@@ -122,6 +122,19 @@ data = {
         /**
          * (Optional)
          *
+         * The property name of the dates function in the "callback" object.
+         *
+         * @type {String}
+         * @default 'dates'
+         */
+        callbackDates: {
+          type: String,
+          value: 'dates'
+        },
+
+        /**
+         * (Optional)
+         *
          * The property name of the terms function in the "callback" object.
          *
          * @type {String}
@@ -166,9 +179,10 @@ data = {
 
         _.keys(this.data).forEach(function(key) {
           if(self.config[key] && self.config[key].field && self.data[key]) {
+            var type = self.config[key].type;
             var field = self.config[key].field;
             var object = self.data[key];
-            var filter = self._buildTermsFilter(key, field, object);
+            var filter = (type === 'date' ? self._buildDateRangeFilter(key, field, object) : self._buildTermsFilter(key, field, object));
             if(filter) {
               filters.push(filter);
             }
@@ -198,6 +212,25 @@ data = {
         }
 
         return this.$$('#builder').buildFilter('terms', false, key, field, terms);
+      },
+
+      /**
+       * Builds and returns the elasticsearch range filter using the given key, field, and filter data object.
+       *
+       * @param {String} key
+       * @param {String} field
+       * @param {Object} object
+       * @return {null|Object}
+       * @private
+       */
+      _buildDateRangeFilter: function(key, field, object) {
+        var dates = this.callback && this.callbackDates && this.callback[this.callbackDates] ? this.callback[this.callbackDates](object) : [null, null];
+
+        if(dates.length !== 2 || (!dates[0] && !dates[1])) {
+          return null;
+        }
+
+        return this.$$('#builder').buildFilter('range', false, key, field, dates);
       }
     });
   })();

@@ -1,15 +1,16 @@
 {
   "name": "filters-builder",
   "description": "A Polymer Element that builds a list of elasticsearch filters using given config and data.",
-  "version": "1.0.0",
-  "authors": ["Next Century Corporation"],
+  "version": "1.0.1",
+  "authors": [
+    "Next Century Corporation"
+  ],
   "license": "Apache-2.0",
   "keywords": [
     "web-component",
     "polymer"
   ],
   "main": "filters-builder.html",
-  "license": "http://polymer.github.io/LICENSE.txt",
   "homepage": "https://github.com/DigElements/filters-builder/",
   "ignore": [
     "/.*",
@@ -17,11 +18,14 @@
   ],
   "dependencies": {
     "polymer": "Polymer/polymer#^1.7.0",
-    "elastic-client-filter-builder": "DigElements/elastic-client-filter-builder#^1.0.6",
+    "elastic-client-filter-builder": "DigElements/elastic-client-filter-builder#^1.0.9",
     "lodash-import": "DigElements/lodash-import#~1.0.1"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.1.7",
     "web-component-tester": "^5.0.0"
+  },
+  "resolutions": {
+    "lodash": "~4.17.2"
   }
 }
