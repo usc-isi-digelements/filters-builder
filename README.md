@@ -2,7 +2,7 @@
 
 A Polymer Element that builds a list of elasticsearch filters using given config and data.
 
-The `callback` object contains callback functions with properties defined by `callbackTerms` (default `terms`)  and `callbackDates` (default `dates`) that return terms (or dates) from filter objects of specific types.  The terms property contains a function that returns the array of terms using the given filter object from `data` (or `[]` by default). The date property has a function that returns an array of dates from `data`.
+The `callback` object contains callback functions with properties defined by `callbackTerms` (default `terms`)  and `callbackDates` (default `dates`) that return terms (or dates) from filter objects of specific types.  The terms property contains a function that returns the array of terms using the given filter object from `data` (or `[]` by default). The dates property has a function that returns an array of dates from `data`.
 
 The `config` object contains a collection of unique keys from `data` mapped to config objects with properties {String} `field` and (Optional) {String} `type`.  The default type is "string".  Supported types are "string" and "date".
 
