@@ -2,9 +2,9 @@
 
 A Polymer Element that builds a list of elasticsearch filters using given config and data.
 
-The `callback` object contains callback functions with properties defined by `callbackTerms` (default `terms`) that return terms from filter objects of specific types.  The terms property contains a function that returns the array of terms using the given filter object from `data` (or `[]` by default).
+The `callback` object contains callback functions with properties defined by `callbackTerms` (default `terms`)  and `callbackDates` (default `dates`) that return terms (or dates) from filter objects of specific types.  The terms property contains a function that returns the array of terms using the given filter object from `data` (or `[]` by default). The date property has a function that returns an array of dates from `data`.
 
-The `config` object contains a collection of unique keys from `data` mapped to config objects with properties {String} `field` and (Optional) {String} `type`.  The default type is "string".  Supported types are "string".
+The `config` object contains a collection of unique keys from `data` mapped to config objects with properties {String} `field` and (Optional) {String} `type`.  The default type is "string".  Supported types are "string" and "date".
 
 The `data` object contains a collection of unique keys mapped to search objects with terms.  The keys in `data` match the keys in `config`.  The filter objects are sent to the `callback` functions.
 
@@ -13,15 +13,20 @@ The `data` object contains a collection of unique keys mapped to search objects 
 callback = {
   terms: function(object) {
     return object.value;
+  },
+  dates: function(object) {
+    return object.value;
   }
 };
 
 config = {
   myKey1: {
-    field: 'myField1'
+    field: 'myField1',
+    type: 'string'
   },
   myKey2: {
-    field: 'myField2'
+    field: 'myField2',
+    type: 'date'
   }
 };
 
@@ -30,7 +35,7 @@ data = {
     value: ['myValue']
   },
   myKey2: {
-    value: [1, 2, 3]
+    value: ['someDate1', 'someDate2']
   }
 };
 ```

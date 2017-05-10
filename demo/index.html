@@ -70,6 +70,17 @@ limitations under the License.
       data="[[data4]]"
       filters="{{filters4}}">
     </filters-builder>
+
+    <h3>Demo #5</h3>
+    <p>Data: [[stringify(data5)]]</p>
+    <p>Filters: [[stringify(filters5)]]</p>
+
+    <filters-builder
+      callback="[[callback]]"
+      config="[[config]]"
+      data="[[data5]]"
+      filters="{{filters5}}">
+    </filters-builder>
   </template>
 
   <script>
@@ -78,6 +89,9 @@ limitations under the License.
 
       demo.callback = {
         terms: function(object) {
+          return object.value;
+        },
+        dates: function(object) {
           return object.value;
         }
       };
@@ -88,6 +102,10 @@ limitations under the License.
         },
         myKey2: {
           field: 'myField2'
+        },
+        myKey3: {
+          field: 'myField3',
+          type: 'date'
         }
       };
 
@@ -111,6 +129,12 @@ limitations under the License.
         },
         myKey2: {
           value: [1, 2]
+        }
+      };
+
+      demo.data5 = {
+        myKey3: {
+          value: ['myValue1', 'myValue2']
         }
       };
 
