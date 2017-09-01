@@ -55,6 +55,21 @@ limitations under the License.
         expect(element.$$('elastic-client-filter-builder').id).to.equal('builder');
       });
 
+      test('_buildFilters does return an empty array if config is undefined', function() {
+        expect(element._buildFilters()).to.deep.equal([]);
+      });
+
+      test('_buildFilters does return an empty array if data is undefined', function() {
+        element.config = {};
+        expect(element._buildFilters()).to.deep.equal([]);
+      });
+
+      test('_buildFilters does return an empty array if data is an object with no properties', function() {
+        element.config = {};
+        element.data = {};
+        expect(element._buildFilters()).to.deep.equal([]);
+      });
+
       test('_buildTermsFilter does return null if callback.terms is undefined', function() {
         expect(element._buildTermsFilter('key', 'field', ['value'])).to.be.null;
       });

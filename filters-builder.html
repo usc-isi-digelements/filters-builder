@@ -182,7 +182,7 @@ data = {
         var self = this;
         var filters = [];
 
-        _.keys(this.data).forEach(function(key) {
+        _.keys(this.data || {}).forEach(function(key) {
           if(self.config[key] && self.config[key].field && self.data[key]) {
             var type = self.config[key].type;
             var field = self.config[key].field;

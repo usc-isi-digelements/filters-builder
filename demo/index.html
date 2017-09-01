@@ -18,130 +18,152 @@ limitations under the License.
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-  <script src="../../webcomponentsjs/webcomponents-lite.min.js"></script>
+  <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
   <link rel="import" href="../filters-builder.html">
 </head>
 
 <body unresolved>
-  <template is="dom-bind" id="demo">
-    <p>Terms Callback: [[callback.terms]]</p>
-    <p>Config: [[stringify(config)]]</p>
+  <dom-bind id="demo">
+    <script>
+      (function(document) {
+        var demo = document.querySelector('dom-bind');
 
-    <h3>Demo #1</h3>
-    <p>Data: [[stringify(data1)]]</p>
-    <p>Filters: [[stringify(filters1)]]</p>
+        demo.callback = {
+          terms: function(object) {
+            return object.value;
+          },
+          dates: function(object) {
+            return object.value;
+          }
+        };
 
-    <filters-builder
-      callback="[[callback]]"
-      config="[[config]]"
-      data="[[data1]]"
-      filters="{{filters1}}">
-    </filters-builder>
+        demo.config = {
+          myString: {
+            field: 'myStringField'
+          },
+          myNumber: {
+            field: 'myNumberField'
+          },
+          myDate: {
+            field: 'myDateField',
+            type: 'date'
+          }
+        };
 
-    <h3>Demo #2</h3>
-    <p>Data: [[stringify(data2)]]</p>
-    <p>Filters: [[stringify(filters2)]]</p>
+        demo.data1 = {};
 
-    <filters-builder
-      callback="[[callback]]"
-      config="[[config]]"
-      data="[[data2]]"
-      filters="{{filters2}}">
-    </filters-builder>
+        demo.data2 = {
+          myString: {
+            value: ['myString1']
+          }
+        };
 
-    <h3>Demo #3</h3>
-    <p>Data: [[stringify(data3)]]</p>
-    <p>Filters: [[stringify(filters3)]]</p>
+        demo.data3 = {
+          myString: {
+            value: ['myString1', 'myString2']
+          }
+        };
 
-    <filters-builder
-      callback="[[callback]]"
-      config="[[config]]"
-      data="[[data3]]"
-      filters="{{filters3}}">
-    </filters-builder>
+        demo.data4 = {
+          myString: {
+            value: ['myString1', 'myString2']
+          },
+          myNumber: {
+            value: [1, 2]
+          }
+        };
 
-    <h3>Demo #4</h3>
-    <p>Data: [[stringify(data4)]]</p>
-    <p>Filters: [[stringify(filters4)]]</p>
+        demo.data5 = {
+          myDate: {
+            value: ['myDateStart', 'myDateEnd']
+          }
+        };
 
-    <filters-builder
-      callback="[[callback]]"
-      config="[[config]]"
-      data="[[data4]]"
-      filters="{{filters4}}">
-    </filters-builder>
+        demo.data6 = {
+          myString: {
+            value: ['myString1', 'myString2']
+          },
+          myDate: {
+            value: ['myDateStart', 'myDateEnd']
+          }
+        };
 
-    <h3>Demo #5</h3>
-    <p>Data: [[stringify(data5)]]</p>
-    <p>Filters: [[stringify(filters5)]]</p>
+        demo.stringify = function(object) {
+          return JSON.stringify(object);
+        };
+      })(document);
+    </script>
 
-    <filters-builder
-      callback="[[callback]]"
-      config="[[config]]"
-      data="[[data5]]"
-      filters="{{filters5}}">
-    </filters-builder>
-  </template>
+    <template is="dom-bind">
+      <p>Terms Callback: [[callback.terms]]</p>
+      <p>Config: [[stringify(config)]]</p>
 
-  <script>
-    (function(document) {
-      var demo = document.querySelector('#demo');
+      <h3>Demo #1</h3>
+      <p>Data: [[stringify(data1)]]</p>
+      <p>Filters: [[stringify(filters1)]]</p>
 
-      demo.callback = {
-        terms: function(object) {
-          return object.value;
-        },
-        dates: function(object) {
-          return object.value;
-        }
-      };
+      <filters-builder
+        callback="[[callback]]"
+        config="[[config]]"
+        data="[[data1]]"
+        filters="{{filters1}}">
+      </filters-builder>
 
-      demo.config = {
-        myKey1: {
-          field: 'myField1'
-        },
-        myKey2: {
-          field: 'myField2'
-        },
-        myKey3: {
-          field: 'myField3',
-          type: 'date'
-        }
-      };
+      <h3>Demo #2</h3>
+      <p>Data: [[stringify(data2)]]</p>
+      <p>Filters: [[stringify(filters2)]]</p>
 
-      demo.data1 = {};
+      <filters-builder
+        callback="[[callback]]"
+        config="[[config]]"
+        data="[[data2]]"
+        filters="{{filters2}}">
+      </filters-builder>
 
-      demo.data2 = {
-        myKey1: {
-          value: ['myValue']
-        }
-      };
+      <h3>Demo #3</h3>
+      <p>Data: [[stringify(data3)]]</p>
+      <p>Filters: [[stringify(filters3)]]</p>
 
-      demo.data3 = {
-        myKey1: {
-          value: ['myValue1', 'myValue2']
-        }
-      };
+      <filters-builder
+        callback="[[callback]]"
+        config="[[config]]"
+        data="[[data3]]"
+        filters="{{filters3}}">
+      </filters-builder>
 
-      demo.data4 = {
-        myKey1: {
-          value: ['myValue1', 'myValue2']
-        },
-        myKey2: {
-          value: [1, 2]
-        }
-      };
+      <h3>Demo #4</h3>
+      <p>Data: [[stringify(data4)]]</p>
+      <p>Filters: [[stringify(filters4)]]</p>
 
-      demo.data5 = {
-        myKey3: {
-          value: ['myValue1', 'myValue2']
-        }
-      };
+      <filters-builder
+        callback="[[callback]]"
+        config="[[config]]"
+        data="[[data4]]"
+        filters="{{filters4}}">
+      </filters-builder>
 
-      demo.stringify = function(object) {
-        return JSON.stringify(object);
-      };
-    })(document);
-  </script>
+      <h3>Demo #5</h3>
+      <p>Data: [[stringify(data5)]]</p>
+      <p>Filters: [[stringify(filters5)]]</p>
+
+      <filters-builder
+        callback="[[callback]]"
+        config="[[config]]"
+        data="[[data5]]"
+        filters="{{filters5}}">
+      </filters-builder>
+
+      <h3>Demo #6</h3>
+      <p>Data: [[stringify(data6)]]</p>
+      <p>Filters: [[stringify(filters6)]]</p>
+
+      <filters-builder
+        callback="[[callback]]"
+        config="[[config]]"
+        data="[[data6]]"
+        filters="{{filters6}}">
+      </filters-builder>
+    </template>
+  </dom-bind>
 </body>
 </html>
