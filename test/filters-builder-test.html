@@ -76,7 +76,9 @@ limitations under the License.
 
       test('_buildTermsFilter does return null if terms are empty', function() {
         element.callback.terms = function(terms) {
-          return terms;
+          return {
+            must: terms
+          };
         };
 
         expect(element._buildTermsFilter('key', 'field', [])).to.be.null;
@@ -84,7 +86,9 @@ limitations under the License.
 
       test('_buildTermsFilter does return correct filter', function() {
         element.callback.terms = function(terms) {
-          return terms;
+          return {
+            must: terms
+          };
         };
 
         expect(element._buildTermsFilter('key', 'field', ['value']).toJSON()).to.deep.equal({
@@ -97,7 +101,9 @@ limitations under the License.
 
       test('_buildTermsFilter does return correct filter with multiple terms', function() {
         element.callback.terms = function(terms) {
-          return terms;
+          return {
+            must: terms
+          };
         };
 
         expect(element._buildTermsFilter('key', 'field', ['value1', 'value2']).toJSON()).to.deep.equal({
@@ -173,7 +179,9 @@ limitations under the License.
 
         element.callback = {
           terms: function(terms) {
-            return terms;
+            return {
+              must: terms
+            };
           },
           dates: function(dates) {
             return dates;

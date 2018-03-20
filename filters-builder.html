@@ -21,7 +21,7 @@ limitations under the License.
 <!--
 A Polymer Element that builds a list of elasticsearch filters using given config and data.
 
-The `callback` object contains callback functions with properties defined by `callbackTerms` (default `terms`)  and `callbackDates` (default `dates`) that return terms (or dates) from filter objects of specific types.  The terms property contains a function that returns the array of terms using the given filter object from `data` (or `[]` by default). The dates property has a function that returns an array of dates from `data`.
+The `callback` object contains callback functions with properties defined by `callbackTerms` (default `terms`)  and `callbackDates` (default `dates`) that return terms (or dates) from filter objects of specific types.  The terms property contains a function that returns the properties `must`, `not`, and `should` mapped to arrays of terms using the given filter object from `data` (or `[]` by default). The dates property has a function that returns the array of dates from `data`.
 
 The `config` object contains a collection of unique keys from `data` mapped to config objects with properties {String} `field` and (Optional) {String} `type`.  The default type is "string".  Supported types are "string" and "date".
 
@@ -91,8 +91,10 @@ data = {
          * An object containing callback functions with properties defined by `callbackTerms` (default `terms`) and
          * `callbackDates` (default `dates`) that return terms (or dates) from filter objects of specific types.
          *
-         * The terms property contains a function that returns the array of terms using the given filter object from `data` (or `[]` by
-         * default). The dates property has a function that returns an array of dates from `data`.
+         * The terms property contains a function that returns the properties `must`, `not`, and `should` mapped to
+         * arrays of terms using the given filter object from `data` (or `[]` by default).
+         *
+         * The dates property has a function that returns the array of dates from `data`.
          *
          * @type {Object}
          */
@@ -210,7 +212,9 @@ data = {
        * @private
        */
       _buildTermsFilter: function(key, field, object) {
-        var terms = this.callback && this.callbackTerms && this.callback[this.callbackTerms] ? this.callback[this.callbackTerms](object) : [];
+        var mappedTerms = this.callback && this.callbackTerms && this.callback[this.callbackTerms] ? this.callback[this.callbackTerms](object) : [];
+        // TODO Add support for the 'not' filters.
+        var terms = (mappedTerms.must || []).concat(mappedTerms.should || []);
 
         if(!terms || !terms.length) {
           return null;

@@ -30,7 +30,9 @@ limitations under the License.
 
         demo.callback = {
           terms: function(object) {
-            return object.value;
+            return {
+              must: object.value
+            };
           },
           dates: function(object) {
             return object.value;

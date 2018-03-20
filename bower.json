@@ -1,7 +1,7 @@
 {
   "name": "filters-builder",
   "description": "A Polymer Element that builds a list of elasticsearch filters using given config and data.",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "authors": ["Next Century Corporation"],
   "license": "Apache-2.0",
   "keywords": [
