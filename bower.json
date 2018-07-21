@@ -9,15 +9,15 @@
     "polymer"
   ],
   "main": "filters-builder.html",
-  "homepage": "https://github.com/DigElements/filters-builder/",
+  "homepage": "https://github.com/usc-isi-digelements/filters-builder/",
   "ignore": [
     "/.*",
     "/test/"
   ],
   "dependencies": {
     "polymer": "Polymer/polymer#^2.0.2",
-    "elastic-client-filter-builder": "DigElements/elastic-client-filter-builder#2.1.0",
-    "lodash-import": "DigElements/lodash-import#~1.0.1"
+    "elastic-client-filter-builder": "usc-isi-digelements/elastic-client-filter-builder#2.1.0",
+    "lodash-import": "usc-isi-digelements/lodash-import#~1.0.1"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^2.0.0",
