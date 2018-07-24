@@ -16,7 +16,7 @@
   ],
   "dependencies": {
     "polymer": "Polymer/polymer#^2.0.2",
-    "elastic-client-filter-builder": "usc-isi-digelements/elastic-client-filter-builder#2.1.0",
+    "elastic-client-filter-builder": "usc-isi-digelements/elastic-client-filter-builder#^2.1.0",
     "lodash-import": "usc-isi-digelements/lodash-import#~1.0.1"
   },
   "devDependencies": {
